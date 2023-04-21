@@ -1,10 +1,14 @@
 import React from "react";
 import HouseListItem from "./HouseListItem";
 
-const HouseList = ({allHouses}) => {
+const HouseList = ({allHouses, onHouseClick}) => {
 
   const houseItems = allHouses.map((house) => {
-    return <HouseListItem houseFirstPass={house}/>
+    return <HouseListItem 
+        key={house.url}
+        houseFirstPass={house}
+        onClick={() => onHouseClick(house)}
+      />
   })
 
   return (
