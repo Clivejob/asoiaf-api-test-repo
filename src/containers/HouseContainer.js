@@ -9,7 +9,7 @@ const HouseContainer = () => {
   const [currentLordState, setCurrentLord] = useState(null);
   const [heirState, setHeir] = useState(null);
   const [overlordState, setOverlord] = useState(null);
-  const [overlordURLState, setOverlordURL] = useState(null);
+  const [selectedHouseData, setSelectedHouseData] = useState(null);
 
   const getHouses = () => {
     let pageNumber = 1;
@@ -38,7 +38,15 @@ const HouseContainer = () => {
 
   const handleHouseClick = (house) => {
     setSelectedHouse(house.url);
-    
+
+    // Fetch selected house
+    fetch(house.url)
+      .then((res) => res.json())
+      .then((houseResult) => {
+        setSelectedHouseData(houseResult);
+      })
+      .catch((error) => console.error(error));
+
     // Fetch current lord
     if (house.currentLord) {
       fetch(house.currentLord)
@@ -48,7 +56,7 @@ const HouseContainer = () => {
     } else {
       setCurrentLord(null);
     }
-  
+
     // Fetch heir
     if (house.heir) {
       fetch(house.heir)
@@ -58,7 +66,7 @@ const HouseContainer = () => {
     } else {
       setHeir(null);
     }
-  
+
     // Fetch overlord
     if (house.overlord) {
       fetch(house.overlord)
@@ -67,13 +75,10 @@ const HouseContainer = () => {
         .catch((error) => console.error(error));
     } else {
       setOverlord(null);
-      setOverlordURL(null);
     }
   };
 
   const handleOverlordClick = (overlordURL) => {
-    // Perform any necessary actions when the overlord is clicked
-    // For example, you can call handleHouseClick with the overlord's house URL
     const overlordHouse = allHousesState.find(house => house.url === overlordURL);
     if (overlordHouse) {
       handleHouseClick(overlordHouse);
@@ -95,36 +100,37 @@ const HouseContainer = () => {
 
     allHousesState.forEach((house) => {
       if (house.region === region) {
-        housesByRegion[region].push(house);
-      }
-    });
+housesByRegion[region].push(house);
+}
+});
 
-    setFilteredHouse(housesByRegion[region]);
-  };
+setFilteredHouse(housesByRegion[region]);
+};
 
-  return (
-    <div>
-      <h2>House Container</h2>
-      <button onClick={() => filterHouses("The North")}>Filter by the North</button>
-      <button onClick={() => filterHouses("The Riverlands")}>Filter by the Riverlands</button>
-      <button onClick={() => filterHouses("The Vale")}>Filter by the Vale</button>
-      <button onClick={() => filterHouses("Iron Islands")}>Filter by the Iron Islands</button>
-      <button onClick={() => filterHouses("The Westerlands")}>Filter by the Westerlands</button>
-      <button onClick={() => filterHouses("The Crownlands")}>Filter by the Crownlands</button>
-      <button onClick={() => filterHouses("The Stormlands")}>Filter by the Stormlands</button>
-      <button onClick={() => filterHouses("The Reach")}>Filter by the Reach</button>
-      <button onClick={() => filterHouses("Dorne")}>Filter by Dorne</button>
-      <HouseList allHouses={filteredHouseState} onHouseClick={handleHouseClick} />
-      {selectedHouseState && (
-        <HouseDetail
-          selectedHouse={selectedHouseState}
-          currentLord={currentLordState}
-          heir={heirState}
-          overlord={overlordState}
-          onOverlordClick={handleOverlordClick}
-          />)}
+return (
+<div>
+<h2>House Container</h2>
+<button onClick={() => filterHouses("The North")}>Filter by the North</button>
+<button onClick={() => filterHouses("The Riverlands")}>Filter by the Riverlands</button>
+<button onClick={() => filterHouses("The Vale")}>Filter by the Vale</button>
+<button onClick={() => filterHouses("Iron Islands")}>Filter by the Iron Islands</button>
+<button onClick={() => filterHouses("The Westerlands")}>Filter by the Westerlands</button>
+<button onClick={() => filterHouses("The Crownlands")}>Filter by the Crownlands</button>
+<button onClick={() => filterHouses("The Stormlands")}>Filter by the Stormlands</button>
+<button onClick={() => filterHouses("The Reach")}>Filter by the Reach</button>
+<button onClick={() => filterHouses("Dorne")}>Filter by Dorne</button>
+<HouseList allHouses={filteredHouseState} onHouseClick={handleHouseClick} />
+{selectedHouseState && (
+  <HouseDetail
+    houseData={selectedHouseData}
+    currentLord={currentLordState}
+    heir={heirState}
+    overlord={overlordState}
+    onOverlordClick={handleOverlordClick}
+  />
+)}
 </div>
 );
 };
 
-export default HouseContainer
+export default HouseContainer;
