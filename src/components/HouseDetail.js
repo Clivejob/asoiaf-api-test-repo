@@ -40,7 +40,7 @@ const HouseDetail = ({
           </p>
         </div>
       ) : (
-        <p>Loading...</p>
+        <p>Loading - Please wait</p>
       )}
     </div>
   );
