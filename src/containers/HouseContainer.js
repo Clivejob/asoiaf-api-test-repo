@@ -5,17 +5,16 @@
   const HouseContainer = () => {
     // SetAllHouses used for the initial fetch, allHousesState used for the overlordClick and for filtering the houses
     const [allHousesState, setAllHouses] = useState([]);
-    // Mostly used in passing down for HouseDetails, setSelectedHouse used for getting the HouseUrl unique identifier
-    const [selectedHouseState, setSelectedHouse] = useState(null);
-    // filteredHouseState passed down to HouseList as AllHouses, setFilteredHouse used in the filterHouses const as the final action
-    const [filteredHouseState, setFilteredHouse] = useState([]);
     // new state created to handle the house details, the useState is given an object key value pairing in order to interact with the demands of handleHouseClick, a null value alone would result in javascript stopping running rather than providing the loading screen in the ternery
-    const [houseDetails, setHouseDetails] = useState({
+    const [selectedHouse, setSelectedHouse] = useState({
       houseData: null,
       currentLord: null,
       heir: null,
       overlord: null,
     });
+    // filteredHouseState passed down to HouseList as AllHouses, setFilteredHouse used in the filterHouses const as the final action
+    const [filteredHouseState, setFilteredHouse] = useState(allHousesState);
+
 
     // function created as const getHouses, no parameters
     const getHouses = () => {
@@ -77,7 +76,7 @@
       // 
       .then(([houseData, lordData, heirData, overlordData]) => {
         // Set houseDetails state with the fetched data, all in the same order as the component destructuring above
-        setHouseDetails({
+        setSelectedHouse({
           houseData,
           currentLord: lordData ? lordData.name : null,
           heir: heirData ? heirData.name : null,
@@ -139,12 +138,12 @@
   <button onClick={() => filterHouses("Dorne")}>Filter by Dorne</button>
   {/* passes down filteredHouseState and handleHouseClick to HouseList */}
   <HouseList allHouses={filteredHouseState} onHouseClick={handleHouseClick} />
-        {selectedHouseState ? (
+        {selectedHouse ? (
           <HouseDetail
-            houseData={houseDetails.houseData}
-            currentLord={houseDetails.currentLord}
-            heir={houseDetails.heir}
-            overlord={houseDetails.overlord}
+            houseData={selectedHouse.houseData}
+            currentLord={selectedHouse.currentLord}
+            heir={selectedHouse.heir}
+            overlord={selectedHouse.overlord}
             onOverlordClick={handleOverlordClick}
           />
         ) : (
