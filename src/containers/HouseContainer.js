@@ -1,12 +1,13 @@
-  import { useState, useEffect } from "react";
-  import HouseList from "../components/HouseList";
-  import HouseDetail from "../components/HouseDetail";
+import { useState, useEffect } from "react";
+import HouseList from "../components/HouseList";
+import HouseDetail from "../components/HouseDetail";
+import HouseFavourite from "../components/HouseFavourite";
 
   const HouseContainer = () => {
     // SetAllHouses used for the initial fetch, allHousesState used for the overlordClick and for filtering the houses
     const [allHousesState, setAllHouses] = useState([]);
     // new state created to handle the house details, the useState is given an object key value pairing in order to interact with the demands of handleHouseClick, a null value alone would result in javascript stopping running rather than providing the loading screen in the ternery
-    const [selectedHouse, setSelectedHouse] = useState({
+    const [selectedHouseState, setSelectedHouse] = useState({
       houseData: null,
       currentLord: null,
       heir: null,
@@ -14,6 +15,10 @@
     });
     // filteredHouseState passed down to HouseList as AllHouses, setFilteredHouse used in the filterHouses const as the final action
     const [filteredHouseState, setFilteredHouse] = useState(allHousesState);
+    // simply more state to facilitate the favouriteHouse idea, uses an empty array as a starting point
+    const [favouriteHouseState, setFavouriteHouses] = useState([]);
+    // consider removing or including
+    const [errorMessage, setErrorMessage] = useState(null)
 
 
     // function created as const getHouses, no parameters
@@ -52,6 +57,7 @@
       // the first run of fetchHouses
       fetchHouses();
     };
+
   // upon the site rendering, the useEffect runs and calls getHouses, the above function. 
     useEffect(() => {
       // runs getHouses, this is typically the 'sideeffect' part
@@ -86,7 +92,7 @@
       .catch((error) => console.error(error));
   };
 
-    // creates a function with the parameter of overlordURL
+    // creates an function with the parameter of overlordURL
     const handleOverlordClick = (overlordURL) => {
       // new const created, overlordHouse, which is equal to the find HOF passed to allHousesState. It takes the house parameter and checks if it is equal to overlordURL 
       const overlordHouse = allHousesState.find(house => house.url === overlordURL);
@@ -123,8 +129,31 @@
   setFilteredHouse(housesByRegion[region]);
   };
 
+  // creates a function taking the house parameter to add to the fav houses array
+  const addToFavouriteHouses = (house) => {
+    // creates a variable which is equal to the HOF find, taking the h parameter, as house is already used. Find returns the first element that satisfies criteria
+    const foundHouse = favouriteHouseState.find((h) => {
+      // as described, find will look for the h.url, which will be unique, foundHouse will now equate to the url
+      return h.url === house.url;
+    });
+    // this if statement exists as we do not want to have two of the same house in the list, defensive coding
+    if (!foundHouse) {
+      // new const created which is an array of the spread of the existing state and the new house, the argument in the parameter which is taken from the onClick
+      const newFavouriteHouseList = [...favouriteHouseState, house];
+      // Alters the state to become the const above
+      setFavouriteHouses(newFavouriteHouseList);
+      // Removes anything from the error message, not entirely necessary to the overall code (Consider removing)
+      setErrorMessage(null);
+    } else {
+      // If none of the above was fufilled, the error message would display as:
+      setErrorMessage("This house is already in the list");
+    }
+  };
+
   return (
   <div>
+  {/* passed down to the HouseFavourite component with the favHouseState and the error messsage */}
+  <HouseFavourite favouriteHouses={favouriteHouseState} errorMessage={errorMessage}/>
   <h2>House Container</h2>
   {/* Buttons with onClick functionality, uses filterHouses function for each click, passing the region string in as the argument's value/argument */}
   <button onClick={() => filterHouses("The North")}>Filter by the North</button>
@@ -137,14 +166,15 @@
   <button onClick={() => filterHouses("The Reach")}>Filter by the Reach</button>
   <button onClick={() => filterHouses("Dorne")}>Filter by Dorne</button>
   {/* passes down filteredHouseState and handleHouseClick to HouseList */}
-  <HouseList allHouses={filteredHouseState} onHouseClick={handleHouseClick} />
-        {selectedHouse ? (
+  <HouseList filteredHouses={filteredHouseState} onHouseClick={handleHouseClick} />
+        {selectedHouseState ? (
           <HouseDetail
-            houseData={selectedHouse.houseData}
-            currentLord={selectedHouse.currentLord}
-            heir={selectedHouse.heir}
-            overlord={selectedHouse.overlord}
+            houseData={selectedHouseState.houseData}
+            currentLord={selectedHouseState.currentLord}
+            heir={selectedHouseState.heir}
+            overlord={selectedHouseState.overlord}
             onOverlordClick={handleOverlordClick}
+            onFavouriteButton={addToFavouriteHouses}
           />
         ) : (
           "Please select a house"

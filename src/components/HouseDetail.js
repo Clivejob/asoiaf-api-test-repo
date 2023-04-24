@@ -1,11 +1,14 @@
 import { useEffect } from "react";
-
+// taking the data from container
 const HouseDetail = ({
+  // individual house data, all components
   houseData,
+  // three
   currentLord,
   heir,
   overlord,
   onOverlordClick,
+  onFavouriteButton,
 }) => {
   useEffect(() => {}, []);
 
@@ -38,6 +41,9 @@ const HouseDetail = ({
               ? "N/A"
               : houseData.ancestralWeapons.join(", ")}
           </p>
+              <div onClick={() => onFavouriteButton(houseData)}>
+              <button>Favourite House</button>
+              </div>
         </div>
       ) : (
         <p>Loading - Please wait</p>
